@@ -1,16 +1,18 @@
-"""Seed the database with sample Paper Mario data."""
+"""Seed the database with comprehensive data from Super Paper Mario."""
 from datetime import datetime, timedelta
-from config import SessionLocal
+from sqlalchemy.orm import Session
+
+from config import engine, SessionLocal
 from models import (
-    Character, PlayableCharacter, Chapter, Location, Pixl,
+    Chapter, Character, PlayableCharacter, Location, Pixl,
     StatusEffect, CharacterStatusEffect, Enemy, Boss, Item,
     Object, NavigationObject, Obstacle, BlockContainer, Switch,
     SideQuest, QuestCharacter
 )
 from models.locations import LocationType
-from models.status_effects import EffectType
 from models.navigation_objects import NavigationType
 from models.blocks_containers import BlockType
+from models.status_effects import EffectType
 from models.side_quests import QuestRole
 
 
