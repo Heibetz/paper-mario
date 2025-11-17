@@ -6,7 +6,7 @@ from api import (
     characters, chapters, enemies, items, side_quests,
     playable_characters, locations, pixls, status_effects,
     bosses, objects, navigation_objects, obstacles,
-    blocks_containers, switches
+    blocks_containers, switches, complex_queries
 )
 
 # Create FastAPI app
@@ -43,6 +43,7 @@ app.include_router(obstacles.router)
 app.include_router(blocks_containers.router)
 app.include_router(switches.router)
 app.include_router(side_quests.router)
+app.include_router(complex_queries.router)
 
 
 @app.get("/")
@@ -53,7 +54,7 @@ def root():
         "docs": "/docs",
         "redoc": "/redoc",
         "version": "1.0.0",
-        "total_endpoints": 15,
+        "total_endpoints": 16,
         "endpoints": {
             "characters": "/characters",
             "playable_characters": "/playable-characters",
@@ -69,7 +70,8 @@ def root():
             "obstacles": "/obstacles",
             "blocks": "/blocks",
             "switches": "/switches",
-            "side_quests": "/side-quests"
+            "side_quests": "/side-quests",
+            "complex_queries": "/queries"
         }
     }
 
