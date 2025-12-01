@@ -139,8 +139,8 @@ def seed_comprehensive():
             ("Bonechill", "Frozen dragon lord of the Overthere", chapters[6].chapter_id, 1, "Ice breath and freeze attacks"),
             ("Count Bleck", "Main antagonist trying to destroy all worlds", chapters[7].chapter_id, 2, "Void magic and invincibility with Chaos Heart"),
             ("Super Dimentio", "Dimentio fused with Luigi and Chaos Heart", chapters[7].chapter_id, 1, "Final boss with invincibility, defeated by Pure Hearts"),
-            ("Wracktail", "Optional dark version of Fracktail", None, 1, "Stronger Fracktail fought in Pit of 100 Trials"),
-            ("Shadoo", "Dark being who transforms into heroes", None, 4, "Shapeshifts into dark versions of Mario, Peach, Bowser, Luigi"),
+            ("Wracktail", "Optional dark version of Fracktail", chapters[0].chapter_id, 1, "Stronger Fracktail fought in Pit of 100 Trials"),
+            ("Shadoo", "Dark being who transforms into heroes", chapters[0].chapter_id, 4, "Shapeshifts into dark versions of Mario, Peach, Bowser, Luigi"),
         ]
         
         bosses = []
@@ -199,7 +199,7 @@ def seed_comprehensive():
             (chapters[0].chapter_id, "Flipside", LocationType.hub, "Main hub world between dimensions"),
             (chapters[0].chapter_id, "Lineland Road", LocationType.level, "First level, flat 2D road"),
             (chapters[0].chapter_id, "Mount Lineland", LocationType.level, "Mountain where Mario learns to flip"),
-            (chapters[0].chapter_id, "Yold Town", LocationType.town, "Town of elderly residents"),
+            (chapters[0].chapter_id, "Yold Town", LocationType.other, "Town of elderly residents"),
             (chapters[0].chapter_id, "Yold Desert", LocationType.level, "Puzzle desert with sand"),
             (chapters[0].chapter_id, "Yold Ruins", LocationType.dungeon, "Ancient ruins with Fracktail boss"),
             # Chapter 2
@@ -217,7 +217,7 @@ def seed_comprehensive():
             (chapters[3].chapter_id, "Outer Limits", LocationType.level, "Space station"),
             (chapters[3].chapter_id, "Whoa Zone", LocationType.dungeon, "Psychedelic dimension with Mr. L"),
             # Chapter 5
-            (chapters[4].chapter_id, "Downtown of Crag", LocationType.town, "Cragnon village"),
+            (chapters[4].chapter_id, "Downtown of Crag", LocationType.other, "Cragnon village"),
             (chapters[4].chapter_id, "Gap of Crag", LocationType.level, "Canyon area"),
             (chapters[4].chapter_id, "Floro Caverns", LocationType.dungeon, "Underground Floro Sapien caves"),
             # Chapter 6
@@ -249,21 +249,21 @@ def seed_comprehensive():
         # ===== STATUS EFFECTS =====
         print("💫 Creating Status Effects...")
         status_data = [
-            ("Poisoned", EffectType.poison, 30, "Gradually lose HP over time"),
-            ("Frozen", EffectType.freeze, 10, "Unable to move or attack"),
-            ("Stunned", EffectType.stun, 5, "Temporarily paralyzed"),
-            ("Burned", EffectType.poison, 15, "Take fire damage over time"),
-            ("Electrified", EffectType.buff, 20, "Damage enemies on contact"),
-            ("Invincible", EffectType.buff, 10, "Cannot take damage"),
-            ("Attack Up", EffectType.buff, 30, "Deal double damage"),
-            ("Defense Up", EffectType.buff, 30, "Take half damage"),
-            ("Slow", EffectType.debuff, 20, "Movement speed reduced"),
-            ("Sleep", EffectType.stun, 15, "Cannot act, wake on damage"),
+            ("Poisoned", EffectType.debuff, 30),
+            ("Frozen", EffectType.debuff, 10),
+            ("Stunned", EffectType.debuff, 5),
+            ("Burned", EffectType.debuff, 15),
+            ("Electrified", EffectType.buff, 20),
+            ("Invincible", EffectType.buff, 10),
+            ("Attack Up", EffectType.buff, 30),
+            ("Defense Up", EffectType.buff, 30),
+            ("Slow", EffectType.debuff, 20),
+            ("Sleep", EffectType.debuff, 15),
         ]
         
         statuses = []
-        for name, effect_type, duration, desc in status_data:
-            statuses.append(StatusEffect(name=name, effect_type=effect_type, duration_seconds=duration, description=desc))
+        for name, effect_type, duration in status_data:
+            statuses.append(StatusEffect(name=name, effect_type=effect_type, duration_seconds=duration))
         db.add_all(statuses)
         db.commit()
         print(f"  ✅ Created {len(statuses)} status effects\n")
@@ -271,14 +271,14 @@ def seed_comprehensive():
         # ===== SIDE QUESTS =====
         print("📜 Creating Side Quests...")
         quests_data = [
-            ("Duel of 100", "Fight through 100 warriors in Sammer's Kingdom", locations[21].location_id, None),
-            ("Flipside Pit Challenge", "Descend 100 floors to face Wracktail", locations[32].location_id, items[20].item_id),
-            ("Flopside Pit Challenge", "Defeat Shadoo at floor 100", locations[33].location_id, items[21].item_id),
+            ("Duel of 100", "Fight through 100 warriors in Sammer's Kingdom", locations[20].location_id, None),
+            ("Flipside Pit Challenge", "Descend 100 floors to face Wracktail", locations[31].location_id, items[19].item_id),
+            ("Flopside Pit Challenge", "Defeat Shadoo at floor 100", locations[32].location_id, items[20].item_id),
             ("Find Missing Pixls", "Locate all optional Pixls", locations[0].location_id, None),
             ("Arcade Master", "Win all arcade games", locations[0].location_id, items[23].item_id),
             ("Recipe Hunting", "Discover all cooking recipes", locations[0].location_id, None),
             ("Card Collector", "Catch all enemy cards", locations[0].location_id, None),
-            ("Merlee's Fortune", "Get fortune readings from Merlee", locations[31].location_id, None),
+            ("Merlee's Fortune", "Get fortune readings from Merlee", locations[7].location_id, None),
         ]
         
         quests = []
@@ -293,22 +293,201 @@ def seed_comprehensive():
         blocks = []
         # Add some blocks with items in various locations
         for i, location in enumerate(locations[:10]):  # First 10 locations
-            if i % 3 == 0:  # Every third location gets a block with Mushroom
+            if i % 3 == 0:  # Every third location gets a breakable block with Mushroom
                 blocks.append(BlockContainer(
                     location_id=location.location_id,
-                    block_type=BlockType.question,
+                    block_type=BlockType.breakable,
                     contains_item_id=items[0].item_id
                 ))
-            else:  # Other blocks are empty brick blocks
+            elif i % 3 == 1:  # Star blocks
                 blocks.append(BlockContainer(
                     location_id=location.location_id,
-                    block_type=BlockType.brick,
+                    block_type=BlockType.star,
+                    contains_item_id=None
+                ))
+            else:  # Movable blocks
+                blocks.append(BlockContainer(
+                    location_id=location.location_id,
+                    block_type=BlockType.movable,
                     contains_item_id=None
                 ))
         
         db.add_all(blocks)
         db.commit()
         print(f"  ✅ Created {len(blocks)} blocks\n")
+        
+        # ===== OBJECTS =====
+        print("🎯 Creating Objects...")
+        objects_data = [
+            # Yold Town & Lineland
+            ("Arrow Sign", "arrow", "Points to Yold Desert", locations[0].location_id),
+            ("Warp Pipe", "warp", "Green pipe to underground area", locations[1].location_id),
+            ("Treasure Chest", "chest", "Contains a Pixl", locations[1].location_id),
+            ("Ladder", "ladder", "Climbs to higher platform", locations[2].location_id),
+            
+            # Gloam Valley
+            ("Lift Platform", "elevator", "Moves between floors", locations[7].location_id),
+            ("Jump Platform", "trampoline", "Bounces player upward", locations[8].location_id),
+            ("Heart Pillar", "pillar", "Accepts Pure Heart", locations[9].location_id),
+            
+            # The Bitlands
+            ("Spinning Device", "spinner", "Rotates platforms", locations[10].location_id),
+            ("Flip Block", "flip_block", "Reveals hidden path in 3D", locations[10].location_id),
+            ("Treasure Chest", "chest", "Contains Barry", locations[12].location_id),
+            
+            # Outer Space
+            ("Space Gate", "portal", "Transport between planets", locations[13].location_id),
+            ("Squarp Hole", "warp", "Dimensional warp point", locations[13].location_id),
+            ("Geyser", "geyser", "Shoots player upward", locations[15].location_id),
+            
+            # Floro Caverns
+            ("Minecart", "vehicle", "Rides on rails", locations[16].location_id),
+            ("Stone Tablet", "tablet", "Elemental puzzle piece", locations[17].location_id),
+            ("Orb Pedestal", "pedestal", "Holds colored orb", locations[17].location_id),
+            
+            # Sammer Kingdom
+            ("Battle Arena", "arena", "Duel platform", locations[20].location_id),
+            
+            # Underwhere/Overthere
+            ("Boat", "vehicle", "Travels River Twygz", locations[21].location_id),
+            ("Cloud Platform", "platform", "Floating cloud", locations[23].location_id),
+            ("Red Apple Tree", "tree", "Produces Red Apples", locations[24].location_id),
+            
+            # Flipside/Flopside
+            ("Heart Pillar", "pillar", "Flipside tower pillar", locations[25].location_id),
+            ("Treasure Chest", "chest", "Contains rare item", locations[25].location_id),
+            ("Grab Block", "throw_block", "Throwable block", locations[26].location_id),
+            ("Coin Block", "coin_block", "Generates coins when hit", locations[26].location_id),
+        ]
+        
+        objects = []
+        for name, obj_type, props, loc_id in objects_data:
+            objects.append(Object(name=name, object_type=obj_type, properties=props, location_id=loc_id))
+        db.add_all(objects)
+        db.commit()
+        print(f"  ✅ Created {len(objects)} objects\n")
+        
+        # ===== NAVIGATION OBJECTS =====
+        print("🚪 Creating Navigation Objects...")
+        nav_objects_data = [
+            # Doors throughout the game
+            (NavigationType.door, "Entrance to Yold Ruins", locations[1].location_id),
+            (NavigationType.door, "Exit from Yold Desert", locations[2].location_id),
+            (NavigationType.door, "Merlee's Mansion entrance", locations[7].location_id),
+            (NavigationType.door, "Dotwood Tree entrance", locations[8].location_id),
+            (NavigationType.door, "Fort Francis main door", locations[11].location_id),
+            (NavigationType.door, "Whoa Zone portal", locations[15].location_id),
+            (NavigationType.door, "Floro Caverns gate", locations[16].location_id),
+            (NavigationType.door, "Underwhere entrance", locations[21].location_id),
+            (NavigationType.door, "Castle Bleck gate", locations[28].location_id),
+            
+            # Elevators
+            (NavigationType.elevator, "Merlee's Mansion lift", locations[7].location_id),
+            (NavigationType.elevator, "Fort Francis elevator", locations[11].location_id),
+            (NavigationType.elevator, "Castle Bleck lift", locations[28].location_id),
+            
+            # Save Blocks
+            (NavigationType.save_block, "Flipside save point", locations[25].location_id),
+            (NavigationType.save_block, "Flopside save point", locations[26].location_id),
+            (NavigationType.save_block, "Yold Town save", locations[0].location_id),
+            (NavigationType.save_block, "Gloam Valley save", locations[7].location_id),
+            (NavigationType.save_block, "Downtown of Crag save", locations[16].location_id),
+            
+            # Star Blocks
+            (NavigationType.star_block, "Flipside star checkpoint", locations[25].location_id),
+            (NavigationType.star_block, "Flopside star checkpoint", locations[26].location_id),
+            
+            # Dimensional Rifts
+            (NavigationType.rift, "Hidden rift to bonus area", locations[10].location_id),
+            (NavigationType.rift, "Secret dimensional door", locations[31].location_id),
+            
+            # Arrow signs
+            (NavigationType.arrow, "Points to next area", locations[0].location_id),
+            (NavigationType.arrow, "Directional marker", locations[13].location_id),
+        ]
+        
+        nav_objects = []
+        for nav_type, props, loc_id in nav_objects_data:
+            nav_objects.append(NavigationObject(type=nav_type, properties=props, location_id=loc_id))
+        db.add_all(nav_objects)
+        db.commit()
+        print(f"  ✅ Created {len(nav_objects)} navigation objects\n")
+        
+        # ===== OBSTACLES =====
+        print("⚠️ Creating Obstacles...")
+        obstacles_data = [
+            # Bottomless pits
+            ("Bottomless Pit", "Instant KO if fallen into", locations[1].location_id),
+            ("Bottomless Pit", "Deep chasm", locations[2].location_id),
+            ("Bottomless Pit", "Endless void", locations[14].location_id),
+            ("Bottomless Pit", "Space void", locations[15].location_id),
+            
+            # Spike hazards
+            ("Spike Trap", "Floor spikes that rise periodically", locations[8].location_id),
+            ("Spike Trap", "Wall spikes", locations[11].location_id),
+            ("Spike Ceiling", "Descending spike ceiling", locations[7].location_id),
+            ("Spike Trap", "Underwhere spikes", locations[21].location_id),
+            
+            # Fire hazards
+            ("Fire Bar", "Rotating fire obstacle", locations[1].location_id),
+            ("Fire Bar", "Castle Bleck fire bars", locations[28].location_id),
+            ("Fire-spitting Lamp", "Shoots fireballs", locations[7].location_id),
+            ("Fire-spitting Lamp", "Candle hazard", locations[17].location_id),
+            
+            # Electrical barriers
+            ("Electrical Barrier", "Electric rail obstacle", locations[7].location_id),
+            
+            # Environmental hazards
+            ("Quicksand", "Slowly sinks the player", locations[2].location_id),
+            ("Dark Area", "Requires fire to illuminate", locations[21].location_id),
+            ("Hedron", "Floating geometric obstacle", locations[15].location_id),
+            
+            # Enemy-like obstacles
+            ("Gnip", "Stone face obstacle", locations[7].location_id),
+            ("Gnaw", "Moving jaw trap", locations[7].location_id),
+            ("Floro Sprout", "Mind-control plant", locations[17].location_id),
+            
+            # Locked doors
+            ("Locked Door", "Requires key to open", locations[25].location_id),
+            ("Locked Door", "Key door in ruins", locations[1].location_id),
+            ("Locked Door", "Fort Francis security", locations[11].location_id),
+            ("Yellow Block", "Requires Cudge to break", locations[17].location_id),
+        ]
+        
+        obstacles = []
+        for obs_type, behavior, loc_id in obstacles_data:
+            obstacles.append(Obstacle(type=obs_type, behavior=behavior, location_id=loc_id))
+        db.add_all(obstacles)
+        db.commit()
+        print(f"  ✅ Created {len(obstacles)} obstacles\n")
+        
+        # ===== SWITCHES =====
+        print("🔘 Creating Switches...")
+        switches_data = [
+            # Switches that control doors
+            ("! Switch", locations[7].location_id, nav_objects[2].navobj_id),  # Controls Merlee's door
+            ("! Switch", locations[28].location_id, nav_objects[8].navobj_id),  # Controls Castle Bleck gate
+            
+            # Switches that control elevators
+            ("Lever", locations[7].location_id, nav_objects[9].navobj_id),  # Controls Merlee's lift
+            ("Lever", locations[11].location_id, nav_objects[10].navobj_id),  # Controls Fort Francis elevator
+            
+            # Gravity switches (no specific target, changes environment)
+            ("Gravity Switch", locations[7].location_id, None),
+            ("Gravity Switch", locations[11].location_id, None),
+            
+            # Additional switches
+            ("! Switch", locations[17].location_id, nav_objects[6].navobj_id),  # Controls Floro gate
+            ("Lever", locations[21].location_id, None),  # Underwhere puzzle
+            ("! Switch", locations[10].location_id, nav_objects[19].navobj_id),  # Controls rift
+        ]
+        
+        switches = []
+        for switch_type, loc_id, target_navobj in switches_data:
+            switches.append(Switch(switch_type=switch_type, location_id=loc_id, target_navobj_id=target_navobj))
+        db.add_all(switches)
+        db.commit()
+        print(f"  ✅ Created {len(switches)} switches\n")
         
         db.commit()
         print("=" * 60)
@@ -326,6 +505,10 @@ def seed_comprehensive():
         print(f"  • {db.query(StatusEffect).count()} Status Effects")
         print(f"  • {db.query(SideQuest).count()} Side Quests")
         print(f"  • {db.query(BlockContainer).count()} Blocks")
+        print(f"  • {db.query(Object).count()} Objects")
+        print(f"  • {db.query(NavigationObject).count()} Navigation Objects")
+        print(f"  • {db.query(Obstacle).count()} Obstacles")
+        print(f"  • {db.query(Switch).count()} Switches")
         print("\n🎮 Ready to explore the world of Super Paper Mario!")
         
     except Exception as e:
